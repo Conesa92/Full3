@@ -88,29 +88,27 @@ const getTaskById = async (id) => {
 };
 
 // Actualizar una tarea en un panel
-const updateTaskInPanel = async (taskId, { name, description, date, responsible, status }) => {
-  // Buscar la tarea por su ID
+const updateTaskInPanel = async (taskId, { name, description, date, responsible, status, fileUrl }) => {
   const task = await Task.findById(taskId);
 
   if (!task) {
-    console.error('Tarea no encontrada para actualizar con ID:', taskId); // Mostrar error en consola
-    return null;  // Si no se encuentra la tarea, se devuelve null
+      console.error("Tarea no encontrada para actualizar con ID:", taskId);
+      throw new Error(`Tarea no encontrada con ID: ${taskId}`);
   }
 
-  // Actualizar los campos de la tarea si se proporcionan nuevos valores
+  // Actualizar campos si se proporcionan
   if (name) task.name = name;
   if (description) task.description = description;
   if (date) task.date = date;
   if (responsible) task.responsible = responsible;
   if (status) task.status = status;
+  if (fileUrl) task.fileUrl = fileUrl;
 
-  // Guardar los cambios en la base de datos
   const updatedTask = await task.save();
-
-  // Devolver la tarea actualizada
-  console.log('Tarea actualizada correctamente:', updatedTask);
+  console.log("Tarea actualizada correctamente:", updatedTask);
   return updatedTask;
 };
+
 
 module.exports = {
   createTaskInPanel,

@@ -41,10 +41,26 @@ const resolvers = {
       });
     },
 
-    updateTask: async (_, { id, name, description, date, responsible, status }) => {
-      // Llamada al controlador para actualizar la tarea sin retornar datos
-      await taskController.updateTaskInPanel(id, { name, description, date, responsible, status });
+    updateTask: async (_, { id, name, description, date, responsible, status, fileUrl }) => {
+      try {
+        const updatedTask = await taskController.updateTaskInPanel(id, {
+          name,
+          description,
+          date,
+          responsible,
+          status,
+          fileUrl,  // Asegúrate de que fileUrl esté pasando correctamente
+        });
+
+        // Devuelve la tarea actualizada
+        return updatedTask;
+      } catch (error) {
+        console.error("Error al actualizar la tarea:", error);
+        throw new Error('No se pudo actualizar la tarea.');
+      }
     },
+
+
 
     deleteTask: async (_, { id }) => {
       // Llamada al controlador para eliminar la tarea sin retorno
