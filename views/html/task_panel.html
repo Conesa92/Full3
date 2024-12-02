@@ -28,8 +28,21 @@
         </div>
     </nav>
 
-    <!-- Area para mostrar los mensajes de error -->
-    <div id="errorMessages" style="color: red; margin-top: 20px;"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+    
+        // Cuando el cliente recibe una tarea actualizada
+        socket.on('tareaActualizada', (data) => {
+            console.log('Tarea actualizada:', data);
+            // Actualizar la interfaz de usuario en consecuencia
+        });
+    
+        // Enviar datos de una tarea actualizada
+        const actualizarTarea = (data) => {
+            socket.emit('actualizarTarea', data);
+        };
+    </script>
 
     <div class="container my-4">
         <h2 class="text-center">Panel de Tareas</h2>

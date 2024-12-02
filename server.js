@@ -55,6 +55,21 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Middleware
 app.use(cors());
 
+//WebSocket
+io.on('connection', (socket) => {
+  console.log('Nuevo usuario conectado');
+
+  socket.on('actualizarTarea', (data) => {
+      console.log('Tarea actualizada:', data);
+      io.emit('tareaActualizada', data); // Enviar la actualización a todos los clientes
+  });
+
+  socket.on('disconnect', () => {
+      console.log('Usuario desconectado');
+  });
+});
+
+
 // Configurar ruta para servir el archivo HTML
 app.use(express.static(path.join(__dirname, "views"))); 
 
