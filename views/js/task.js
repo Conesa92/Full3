@@ -455,5 +455,8 @@ document.getElementById('editTaskForm').addEventListener('submit', updateTask);
             }
         };
 
+
+        
+
 // Llamada inicial para cargar los paneles cuando se carga la página
 loadPanels();
