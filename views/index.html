@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <style>
+        /* Asegurar que el footer se quede en el fondo de la página */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        /* Estilo para el bloque de texto antes del botón */
+        .text-block {
+            margin: 20px 0;
+        }
+
+        /* Estilo para centrar el contenido dentro del footer */
+        footer {
+            margin-top: auto; /* Empuja el footer hacia el final */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Producto I - To do list</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="html/create_panel.html">Crear Panel</a></li>
+                    <li class="nav-item"><a class="nav-link" href="html/task_panel.html">Panel Tareas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 content">
+        <h1 class="text-center">Bienvenidos a nuestro to do list:</h1>
+
+        <!-- Bloque de texto antes del botón -->
+        <div class="text-center">
+            <p>En esta plataforma podrás organizar todas tus tareas de manera eficiente. ¡Comienza ahora a crear tus paneles de tareas!</p>
+        </div>
+
+        <!-- Botón central para crear un panel -->
+        <div class="text-center my-4">
+            <a href="html/create_panel.html" class="btn btn-primary">Crear Panel</a>
+        </div>
+
+        <!-- Lista de Paneles de Tareas -->
+        <div id="panelContainer" class="row"></div>
+    </div>
+
+    <!-- Modal para editar panel -->
+    <div class="modal fade" id="editPanelModal" tabindex="-1" aria-labelledby="editPanelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPanelModalLabel">Editar Panel</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPanelForm">
+                        <div class="form-group">
+                            <label for="panelTitle">Título del Panel</label>
+                            <input type="text" class="form-control" id="panelTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="panelDescription">Descripción</label>
+                            <textarea class="form-control" id="panelDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="panelDate">Fecha</label>
+                            <input type="date" class="form-control" id="panelDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer (Pie de página) -->
+    <footer class="bg-light text-center text-lg-start">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">To-Do List App</h5>
+                    <p>Una aplicación para gestionar tus tareas de manera eficiente.</p>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contacto</h5>
+                    <p>Email: contacto@todolistapp.com</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 123, 255, 0.1);">
+            © 2024 To-Do List App. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        let currentEditTitle = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const panelContainer = document.getElementById('panelContainer');
+            const storedPanels = JSON.parse(localStorage.getItem('panels')) || {};
+
+            Object.keys(storedPanels).forEach(title => {
+                const panel = storedPanels[title];
+                const panelCard = document.createElement('div');
+                panelCard.classList.add('col-md-4', 'mb-4');
+                panelCard.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${title}</h5>
+                            <p class="card-text">${panel.description}</p>
+                            <p class="card-text"><small class="text-muted">Creado el ${panel.date}</small></p>
+                            <a href="html/task_panel.html?id=${title}" class="btn btn-primary">Ir a Panel</a>
+                            <button class="btn btn-warning ml-2" onclick="openEditModal('${title}')">Editar</button>
+                            <button class="btn btn-danger ml-2" onclick="deletePanel('${title}')">Borrar</button>
+                        </div>
+                    </div>
+                `;
+                panelContainer.appendChild(panelCard);
+            });
+        });
+
+        function openEditModal(title) {
+            const storedPanels = JSON.parse(localStorage.getItem('panels')) || {};
+            const panel = storedPanels[title];
+
+            if (panel) {
+                currentEditTitle = title;
+                document.getElementById('panelTitle').value = panel.title;
+                document.getElementById('panelDescription').value = panel.description;
+                document.getElementById('panelDate').value = panel.date;
+                $('#editPanelModal').modal('show');
+            }
+        }
+
+        document.getElementById('editPanelForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('panelTitle').value;
+            const description = document.getElementById('panelDescription').value;
+            const date = document.getElementById('panelDate').value;
+
+            const storedPanels = JSON.parse(localStorage.getItem('panels')) || {};
+
+            if (currentEditTitle && currentEditTitle !== title) {
+                delete storedPanels[currentEditTitle];
+            }
+
+            storedPanels[title] = { title, description, date };
+            localStorage.setItem('panels', JSON.stringify(storedPanels));
+
+            $('#editPanelModal').modal('hide');
+            window.location.reload();
+        });
+
+        function deletePanel(title) {
+            const storedPanels = JSON.parse(localStorage.getItem('panels')) || {};
+            delete storedPanels[title];
+            localStorage.setItem('panels', JSON.stringify(storedPanels));
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
