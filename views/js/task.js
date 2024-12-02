@@ -95,18 +95,20 @@ const loadTasksForPanel = async (panelId, panelName) => {
         } else {
             // Si hay tareas, mostrarlas
             data.getTasksByPanel.forEach(task => {
-                const formattedDate = new Date(task.date).toLocaleDateString();
-
+                console.log("Fecha de tarea:", task.date);  // Verificar la fecha que llega
+                const formattedDate = convertDate(task.date);
+                
+            
                 const taskCard = document.createElement('div');
                 taskCard.classList.add('card', 'task-card');
                 taskCard.id = task.id;
                 taskCard.dataset.status = task.status;
-
+            
                 let fileHtml = '';
                 if (task.fileUrl) {
                     fileHtml = `<p><strong>Archivo:</strong> <a href="${task.fileUrl}" target="_blank">Ver archivo</a></p>`;
                 }
-
+            
                 taskCard.innerHTML = `
                     <div class="card-body">
                         <h5 class="card-title">${task.name}</h5>
@@ -120,7 +122,7 @@ const loadTasksForPanel = async (panelId, panelName) => {
                         </div>
                     </div>
                 `;
-
+                
                 // Asignar tareas a la lista correspondiente según su estado
                 if (task.status === 'Por hacer') {
                     document.getElementById('todoList').appendChild(taskCard);
@@ -146,24 +148,18 @@ const loadTasksForPanel = async (panelId, panelName) => {
 };
 
    
-//Función para convertir la fecha del formato DD/MM/YYYY a YYYY-MM-DD
+        //Función para convertir la fecha del formato DD/MM/YYYY a YYYY-MM-DD
         const convertDate = (date) => {
-        if (!date || isNaN(Date.parse(date))) {
-            console.error('Fecha no válida:', date);
-            return ''; // Retorna un valor vacío si la fecha no es válida
-        }
+            if (!date || (isNaN(date) && isNaN(Date.parse(date)))) {
+                console.error('Fecha no válida:', date);
+                return 'Fecha no disponible';  // Retorna un mensaje en lugar de una cadena vacía
+            }
 
-        // Si la fecha es válida, la convertimos
-        const dateObj = new Date(date);
-        const dateStr = dateObj.toISOString().split('T')[0]; // Convertir la fecha a formato 'YYYY-MM-DD'
+            // Si la fecha es un número (timestamp), la convertimos a un objeto Date
+            const dateObj = (isNaN(date)) ? new Date(date) : new Date(parseInt(date)); // Si es un número, convertirlo a Date
 
-        // Aplicar padStart para asegurar que el día y mes tengan dos dígitos
-        const [year, month, day] = dateStr.split('-');
-        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-
-        return formattedDate;
+            return dateObj.toISOString().split('T')[0]; // Devuelve la fecha en formato YYYY-MM-DD
         };
-
 
         let editingTaskId = null; // Variable para almacenar el ID de la tarea que se está editando
 
