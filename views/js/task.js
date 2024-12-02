@@ -18,16 +18,6 @@ const fetchGraphQL = async (query, variables = {}) => {
 
     return result.data;
 };
-const showError = (message) => {
-  // Muestra el mensaje de error en la consola
-  console.error(message);
-
-  // Opcionalmente, muestra el mensaje en el área de la interfaz
-  const errorDiv = document.getElementById('errorMessages');
-  if (errorDiv) {
-    errorDiv.textContent = message;
-  }
-};
 
 const loadPanels = async () => {
     const query = `query GetPanels {
@@ -214,165 +204,159 @@ const loadTasksForPanel = async (panelId, panelName) => {
         };
         
         // Función para actualizar la tarea
-const updateTask = async (event) => {
-    event.preventDefault(); // Evitar el comportamiento por defecto del formulario
-
-    // Obtener los datos del formulario de edición
-    const taskName = document.getElementById('editTaskName').value.trim();
-    const taskDescription = document.getElementById('editTaskDescription').value.trim();
-    const taskDate = document.getElementById('editTaskDate').value;
-    const taskResponsible = document.getElementById('editTaskResponsible').value.trim();
-    const taskStatus = document.getElementById('editTaskStatus').value;
-    const taskFile = document.getElementById('taskFile').files[0];  // Obtenemos el archivo si existe
-
-    // Validar los datos antes de continuar
-    if (!taskName || !taskDescription || !taskDate || !taskResponsible || !taskStatus) {
-        alert("Por favor, complete todos los campos obligatorios.");
-        return;
-    }
-
-    let fileUrl = null;
-
-    // Si se selecciona un archivo, se sube
-    if (taskFile) {
-        const formData = new FormData();
-        formData.append('taskFile', taskFile);
-
-        try {
-            // Subir el archivo al servidor
-            const fileUploadResponse = await fetch('http://localhost:4000/upload', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const fileUploadResult = await fileUploadResponse.json();
-
-            if (fileUploadResult.error) {
-                console.error("Error al cargar el archivo:", fileUploadResult.error);
-                alert("Error al cargar el archivo.");
-                return;
-            }
-
-            // Obtener la URL del archivo
-            fileUrl = fileUploadResult.fileUrl || null;
-            console.log("URL del archivo:", fileUrl);
-        } catch (error) {
-            console.error("Error al subir el archivo:", error);
-            alert("Error al procesar la carga del archivo.");
-            return;
-        }
-    }
-
-    // Enviar la solicitud de actualización de la tarea
-    try {
-        const mutationResponse = await fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `
-                    mutation UpdateTask($id: ID!, $name: String!, $description: String!, $date: String!, $responsible: String!, $status: String!, $fileUrl: String) {
-                        updateTask(id: $id, name: $name, description: $description, date: $date, responsible: $responsible, status: $status, fileUrl: $fileUrl) {
-                            id
-                            name
-                            description
-                            date
-                            responsible
-                            status
-                            fileUrl
-                        }
-                    }
-                `,
-                variables: {
-                    id: editingTaskId,  // ID de la tarea que estamos editando
-                    name: taskName,
-                    description: taskDescription,
-                    date: taskDate,
-                    responsible: taskResponsible,
-                    status: taskStatus,
-                    fileUrl: fileUrl,  // Pasar la URL del archivo (si existe)
-                }
-            })
-        });
-
-        const result = await mutationResponse.json();
-
-        if (result.errors) {
-            console.error("Error al actualizar la tarea:", result.errors);
-            alert("Hubo un problema al actualizar la tarea.");
-        } else {
-            alert("Tarea actualizada exitosamente!");
-            $('#editTaskModal').modal('hide');
-            loadTasksForPanel(selectedPanelId); // Recargar tareas con la tarea actualizada
-        }
-    } catch (error) {
-        console.error("Error al actualizar la tarea:", error);
-        alert("Hubo un error al procesar la solicitud.");
-    }
-};
-
-// Agregar el listener al formulario de edición
-document.getElementById('editTaskForm').addEventListener('submit', updateTask);
-
-
-
-        // Funcion crear Tarea
-        const createTask = async (event) => {
-            event.preventDefault(); // Evitar el comportamiento por defecto del formulario
-
-            // Verifica si un panel ha sido seleccionado
-            if (!selectedPanelId) {
-                alert("Por favor, selecciona un panel antes de crear una tarea.");
-                return;
-            }
-
-            const taskName = document.getElementById('taskName').value.trim();
-            const taskDescription = document.getElementById('taskDescription').value.trim();
-            const taskDate = document.getElementById('taskDate').value;
-            const taskResponsible = document.getElementById('taskResponsible').value.trim();
-            const taskStatus = document.getElementById('taskStatus').value;
+        const updateTask = async (event) => {
+            event.preventDefault(); 
+        
+            // Obtener los datos del formulario
+            const taskName = document.getElementById('editTaskName').value.trim();
+            const taskDescription = document.getElementById('editTaskDescription').value.trim();
+            const taskDate = document.getElementById('editTaskDate').value;
+            const taskResponsible = document.getElementById('editTaskResponsible').value.trim();
+            const taskStatus = document.getElementById('editTaskStatus').value;
             const taskFile = document.getElementById('taskFile').files[0];
-
-            // Validar los datos antes de continuar
+        
             if (!taskName || !taskDescription || !taskDate || !taskResponsible || !taskStatus) {
                 alert("Por favor, complete todos los campos obligatorios.");
                 return;
             }
-
+        
             let fileUrl = null;
-
-            // Si se selecciona un archivo, se sube
+        
             if (taskFile) {
                 const formData = new FormData();
                 formData.append('taskFile', taskFile);
-
+        
                 try {
-                    // Subir el archivo al servidor
                     const fileUploadResponse = await fetch('http://localhost:4000/upload', {
                         method: 'POST',
                         body: formData,
                     });
-
+        
                     const fileUploadResult = await fileUploadResponse.json();
-
+        
                     if (fileUploadResult.error) {
                         console.error("Error al cargar el archivo:", fileUploadResult.error);
                         alert("Error al cargar el archivo.");
                         return;
                     }
-
-                    // Obtener la URL del archivo
+        
                     fileUrl = fileUploadResult.fileUrl || null;
-                    console.log("URL del archivo:", fileUrl);
                 } catch (error) {
                     console.error("Error al subir el archivo:", error);
                     alert("Error al procesar la carga del archivo.");
                     return;
                 }
             }
+        
+            try {
+                const updateResponse = await fetch('http://localhost:4000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation UpdateTask($id: ID!, $name: String!, $description: String!, $date: String!, $responsible: String!, $status: String!, $fileUrl: String) {
+                                updateTask(id: $id, name: $name, description: $description, date: $date, responsible: $responsible, status: $status, fileUrl: $fileUrl) {
+                                    id
+                                    name
+                                    description
+                                    date
+                                    responsible
+                                    status
+                                    fileUrl
+                                }
+                            }
+                        `,
+                        variables: {
+                            id: editingTaskId, 
+                            name: taskName,
+                            description: taskDescription,
+                            date: taskDate,
+                            responsible: taskResponsible,
+                            status: taskStatus,
+                            fileUrl: fileUrl,
+                        }
+                    })
+                });
+        
+                const result = await updateResponse.json();
+        
+                if (result.errors) {
+                    console.error("Error al actualizar tarea:", result.errors);
+                    alert("Hubo un problema al actualizar la tarea.");
+                } else {
+                    const updatedTask = result.data.updateTask;
+                    alert("Tarea actualizada exitosamente!");
+                    $('#editTaskModal').modal('hide');
+                    
+                    // Emitir el evento de WebSocket para notificar a otros clientes
+                    socket.emit('editTask', updatedTask);
+                }
+            } catch (error) {
+                console.error("Error al procesar la solicitud:", error);
+                alert("Error al procesar la solicitud.");
+            }
+        };
 
-            // Crear la tarea sin necesidad de que el archivo sea obligatorio
+    // Agregar el listener al formulario de edición
+    document.getElementById('editTaskForm').addEventListener('submit', updateTask);
+
+
+
+        // Funcion crear Tarea
+        const createTask = async (event) => {
+            event.preventDefault(); 
+        
+            // Validación de los datos
+            if (!selectedPanelId) {
+                alert("Por favor, selecciona un panel antes de crear una tarea.");
+                return;
+            }
+        
+            const taskName = document.getElementById('taskName').value.trim();
+            const taskDescription = document.getElementById('taskDescription').value.trim();
+            const taskDate = document.getElementById('taskDate').value;
+            const taskResponsible = document.getElementById('taskResponsible').value.trim();
+            const taskStatus = document.getElementById('taskStatus').value;
+            const taskFile = document.getElementById('taskFile').files[0];
+        
+            // Validar los datos antes de continuar
+            if (!taskName || !taskDescription || !taskDate || !taskResponsible || !taskStatus) {
+                alert("Por favor, complete todos los campos obligatorios.");
+                return;
+            }
+        
+            let fileUrl = null;
+        
+            // Si se selecciona un archivo, se sube
+            if (taskFile) {
+                const formData = new FormData();
+                formData.append('taskFile', taskFile);
+        
+                try {
+                    const fileUploadResponse = await fetch('http://localhost:4000/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+        
+                    const fileUploadResult = await fileUploadResponse.json();
+        
+                    if (fileUploadResult.error) {
+                        console.error("Error al cargar el archivo:", fileUploadResult.error);
+                        alert("Error al cargar el archivo.");
+                        return;
+                    }
+        
+                    fileUrl = fileUploadResult.fileUrl || null;
+                } catch (error) {
+                    console.error("Error al subir el archivo:", error);
+                    alert("Error al procesar la carga del archivo.");
+                    return;
+                }
+            }
+        
+            // Crear la tarea en el servidor
             try {
                 const taskMutationResponse = await fetch('http://localhost:4000/graphql', {
                     method: 'POST',
@@ -399,20 +383,24 @@ document.getElementById('editTaskForm').addEventListener('submit', updateTask);
                             date: taskDate,
                             responsible: taskResponsible,
                             status: taskStatus,
-                            fileUrl: fileUrl, // Pasar la URL del archivo solo si existe
-                            panelId: selectedPanelId  // Agregar el ID del panel seleccionado
+                            fileUrl: fileUrl,
+                            panelId: selectedPanelId,
                         }
                     })
                 });
-
+        
                 const result = await taskMutationResponse.json();
-
+        
                 if (result.errors) {
                     console.error("Error al crear tarea:", result.errors);
                     alert("Hubo un error al crear la tarea.");
                 } else {
+                    const newTask = result.data.createTask;
                     alert("Tarea creada exitosamente!");
                     $('#createTaskModal').modal('hide');
+        
+                    // Emitir el evento de WebSocket para notificar a otros clientes
+                    socket.emit('createTask', newTask);
                 }
             } catch (error) {
                 console.error("Error al enviar la solicitud:", error);
@@ -432,30 +420,24 @@ document.getElementById('editTaskForm').addEventListener('submit', updateTask);
                         deleteTask(id: $id)
                     }
                 `;
-
+        
                 try {
                     const result = await fetchGraphQL(mutation, { id: taskId });
-
-                    // Verifica si hay errores en la respuesta de GraphQL
+        
                     if (result.errors && result.errors.length > 0) {
-                        console.error('Error al eliminar la tarea:', result.errors);  // Solo mostrar errores si existen
+                        console.error('Error al eliminar la tarea:', result.errors);
                         alert("No se pudo eliminar la tarea.");
                     } else {
-                        // Si la eliminación fue exitosa, eliminamos el elemento en el frontend
-                        console.log('Tarea eliminada', result.deleteTask);  // Aquí result.deleteTask es el mensaje de éxito
-                        document.getElementById(taskId).remove();  // Eliminar el elemento de la vista
-
-                        // Mostrar un mensaje de éxito (opcional)
-                        alert('Tarea eliminada correctamente.');
+                        alert('Tarea eliminada');
+                        // Emitir evento de WebSocket
+                        socket.emit('deleteTask', taskId);
                     }
                 } catch (error) {
-                    console.error('Error al eliminar la tarea:', error); // Asegúrate de mostrar solo los errores importantes
-                    alert("No se pudo eliminar la tarea debido a un error en el servidor.");
+                    console.error('Error al realizar la mutación de eliminación:', error);
+                    alert("Error al eliminar la tarea.");
                 }
             }
         };
-
-
         
 
 // Llamada inicial para cargar los paneles cuando se carga la página

@@ -56,16 +56,31 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
 
 //WebSocket
+// Conexión de WebSocket
 io.on('connection', (socket) => {
-  console.log('Nuevo usuario conectado');
+  console.log('Un cliente se ha conectado.');
 
-  socket.on('actualizarTarea', (data) => {
-      console.log('Tarea actualizada:', data);
-      io.emit('tareaActualizada', data); // Enviar la actualización a todos los clientes
+  // Escuchar evento de creación de tarea
+  socket.on('createTask', (task) => {
+      console.log('Nueva tarea creada:', task);
+      // Emitir un evento a todos los clientes conectados
+      io.emit('taskCreated', task);
+  });
+
+  // Escuchar evento de edición de tarea
+  socket.on('editTask', (task) => {
+      console.log('Tarea editada:', task);
+      io.emit('taskEdited', task);
+  });
+
+  // Escuchar evento de eliminación de tarea
+  socket.on('deleteTask', (taskId) => {
+      console.log('Tarea eliminada:', taskId);
+      io.emit('taskDeleted', taskId);
   });
 
   socket.on('disconnect', () => {
-      console.log('Usuario desconectado');
+      console.log('Un cliente se ha desconectado.');
   });
 });
 
