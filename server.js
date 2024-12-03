@@ -10,6 +10,7 @@ const resolvers = require("./graphql/resolvers");
 const connectToDatabase = require("./config/database");
 require("dotenv").config();
 
+
 // Inicializar Express y HTTP Server
 const app = express();
 const server = http.createServer(app);
@@ -111,6 +112,7 @@ app.post('/upload', upload.single('taskFile'), (req, res) => {
 connectToDatabase()
   .then(() => {
     console.log("Conectado a la base de datos");
+
     startApolloServer().then(() => {
       server.listen(port, () => {
         console.log(`Servidor corriendo en http://localhost:${port}`);
@@ -120,3 +122,5 @@ connectToDatabase()
   .catch((err) => {
     console.error("Error al conectar a la base de datos:", err);
   });
+
+module.exports = connectToDatabase;
