@@ -1,5 +1,5 @@
 const Panel = require('../models/panel');
-const Task = require('../models/Task');
+const Task = require('../models/task');
 
 // Crear un nuevo panel
 async function createPanel(name, description, proceso) {

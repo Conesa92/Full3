@@ -1,4 +1,4 @@
-const Task = require('../models/Task');
+const Task = require('../models/task');
 const Panel = require('../models/panel');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });  // Guardar en la carpeta 'uploads'
