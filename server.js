@@ -59,7 +59,7 @@ app.use(cors());
 //WebSocket
 // Conexión de WebSocket
 io.on('connection', (socket) => {
-  console.log('Un cliente se ha conectado.');
+  console.log();
 
   // Escuchar evento de creación de tarea
   socket.on('createTask', (task) => {
@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-      console.log('Un cliente se ha desconectado.');
+      console.log();
   });
 });
 
