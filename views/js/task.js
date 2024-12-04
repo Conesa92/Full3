@@ -410,6 +410,8 @@ const loadTasksForPanel = async (panelId, panelName) => {
                 alert("Error al procesar la solicitud.");
             }
 
+            
+
         };
 
         // Agregar el listener al formulario
@@ -441,8 +443,6 @@ const loadTasksForPanel = async (panelId, panelName) => {
                     alert("Error al eliminar la tarea.");
                 }
 
-                //Recarga las tareas
-                loadTasksForPanel();
             }
         };
         
