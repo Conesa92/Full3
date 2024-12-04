@@ -17,16 +17,6 @@ const fetchGraphQL = async (query, variables = {}) => {
     return result.data;
 };
 
-const showError = (message) => {
-    // Muestra el mensaje de error en la consola
-    console.error(message);
-  
-    // Opcionalmente, muestra el mensaje en el área de la interfaz
-    const errorDiv = document.getElementById('errorMessages');
-    if (errorDiv) {
-      errorDiv.textContent = message;
-    }
-  };
 
 // Crear un panel con GraphQL
 document.getElementById('createPanelForm').addEventListener('submit', async (event) => {

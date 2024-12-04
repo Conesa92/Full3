@@ -1,5 +1,5 @@
 let selectedPanelId = null;
-
+// Inicializar Fetch
 const fetchGraphQL = async (query, variables = {}) => {
     const response = await fetch('http://localhost:4000/graphql', {
         method: 'POST',
@@ -19,6 +19,7 @@ const fetchGraphQL = async (query, variables = {}) => {
     return result.data;
 };
 
+// Cargar Paneles en botones
 const loadPanels = async () => {
     const query = `query GetPanels {
         getPanels {
@@ -48,12 +49,14 @@ const loadPanels = async () => {
     }
 };
 
+//Boton Paneles
 const selectPanelButton = (selectedButton) => {
     const allButtons = document.querySelectorAll('.panel-button');
     allButtons.forEach(button => button.classList.remove('selected'));
     selectedButton.classList.add('selected');
 };
 
+//Cargar Las tareas del panel. 
 const loadTasksForPanel = async (panelId, panelName) => {
     const query = `query GetTasksByPanel($panelId: ID!) {
         getTasksByPanel(panelId: $panelId) {
@@ -406,6 +409,7 @@ const loadTasksForPanel = async (panelId, panelName) => {
                 console.error("Error al enviar la solicitud:", error);
                 alert("Error al procesar la solicitud.");
             }
+
         };
 
         // Agregar el listener al formulario
@@ -436,6 +440,9 @@ const loadTasksForPanel = async (panelId, panelName) => {
                     console.error('Error al realizar la mutación de eliminación:', error);
                     alert("Error al eliminar la tarea.");
                 }
+
+                //Recarga las tareas
+                loadTasksForPanel();
             }
         };
         

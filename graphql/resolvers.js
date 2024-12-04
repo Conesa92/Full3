@@ -37,7 +37,7 @@ const resolvers = {
         date,
         responsible,
         status,
-        fileUrl,  // Asegúrate de que fileUrl esté pasando correctamente
+        fileUrl,  
       });
     },
 
@@ -49,7 +49,7 @@ const resolvers = {
           date,
           responsible,
           status,
-          fileUrl,  // Asegúrate de que fileUrl esté pasando correctamente
+          fileUrl,  
         });
 
         // Devuelve la tarea actualizada
